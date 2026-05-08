@@ -77,11 +77,12 @@ app.get('/', (_req: Request, res: Response) => {
 app.use(notFound);
 app.use(errorHandler);
 
-// Start server
-const PORT = config.port;
+// Start server only when not in Vercel serverless environment
+if (!process.env.VERCEL) {
+  const PORT = config.port;
 
-app.listen(PORT, () => {
-  console.log(`
+  app.listen(PORT, () => {
+    console.log(`
 ╔═══════════════════════════════════════════════════╗
 ║                                                   ║
 ║   🌸 TENDRYX Store API                            ║
@@ -93,7 +94,8 @@ app.listen(PORT, () => {
 ║   Health: http://localhost:${PORT}/health           ║
 ║                                                   ║
 ╚═══════════════════════════════════════════════════╝
-  `);
-});
+    `);
+  });
+}
 
 export default app;

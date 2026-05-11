@@ -71,7 +71,8 @@ export interface ICategory extends Document {
 export interface IOrder extends Document {
   _id: Types.ObjectId;
   orderNumber: string;
-  user: Types.ObjectId;
+  user?: Types.ObjectId;
+  customer: ICustomerInfo;
   items: IOrderItem[];
   subtotal: number;
   tax: number;
@@ -80,10 +81,25 @@ export interface IOrder extends Document {
   status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
   paymentMethod: string;
-  shippingAddress: IAddress;
+  shippingAddress: IShippingAddress;
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ICustomerInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+}
+
+export interface IShippingAddress {
+  department: string;
+  city: string;
+  address: string;
+  postalCode?: string;
+  country: string;
 }
 
 export interface IOrderItem {

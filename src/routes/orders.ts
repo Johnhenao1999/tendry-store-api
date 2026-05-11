@@ -6,29 +6,35 @@ import { validate } from '../middleware/validate';
 
 const router = Router();
 
-// Validation rules
-const createOrderValidation = [
+// Validation rules for public orders
+const createPublicOrderValidation = [
   body('items')
     .isArray({ min: 1 }).withMessage('El pedido debe tener al menos un producto'),
   body('items.*.productId')
     .isMongoId().withMessage('ID de producto inválido'),
   body('items.*.quantity')
     .isInt({ min: 1 }).withMessage('La cantidad debe ser al menos 1'),
-  body('shippingAddress.street')
+  body('customer.firstName')
     .trim()
-    .notEmpty().withMessage('La calle es requerida'),
+    .notEmpty().withMessage('El nombre es requerido'),
+  body('customer.lastName')
+    .trim()
+    .notEmpty().withMessage('El apellido es requerido'),
+  body('customer.email')
+    .trim()
+    .isEmail().withMessage('Email inválido'),
+  body('customer.phone')
+    .trim()
+    .notEmpty().withMessage('El teléfono es requerido'),
+  body('shippingAddress.department')
+    .trim()
+    .notEmpty().withMessage('El departamento es requerido'),
   body('shippingAddress.city')
     .trim()
     .notEmpty().withMessage('La ciudad es requerida'),
-  body('shippingAddress.state')
+  body('shippingAddress.address')
     .trim()
-    .notEmpty().withMessage('La provincia es requerida'),
-  body('shippingAddress.postalCode')
-    .trim()
-    .notEmpty().withMessage('El código postal es requerido'),
-  body('shippingAddress.country')
-    .trim()
-    .optional(),
+    .notEmpty().withMessage('La dirección es requerida'),
   body('paymentMethod')
     .trim()
     .notEmpty().withMessage('El método de pago es requerido'),
@@ -45,10 +51,13 @@ const updateStatusValidation = [
     .withMessage('Estado de pago inválido'),
 ];
 
-// User routes
+// Public route - Create order without authentication
+router.post('/public', validate(createPublicOrderValidation), orderController.createPublicOrder);
+
+// User routes (authenticated)
 router.get('/my-orders', authenticate, orderController.getMyOrders);
 router.get('/:id', authenticate, orderController.getOrder);
-router.post('/', authenticate, validate(createOrderValidation), orderController.createOrder);
+router.post('/', authenticate, validate(createPublicOrderValidation), orderController.createOrder);
 router.post('/:id/cancel', authenticate, orderController.cancelOrder);
 
 // Admin routes

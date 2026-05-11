@@ -13,12 +13,19 @@ const orderItemSchema = new Schema({
   image: { type: String, required: true },
 }, { _id: false });
 
-const addressSchema = new Schema({
-  street: { type: String, required: true },
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  postalCode: { type: String, required: true },
-  country: { type: String, required: true, default: 'España' },
+const customerSchema = new Schema({
+  firstName: { type: String, required: true, trim: true },
+  lastName: { type: String, required: true, trim: true },
+  email: { type: String, required: true, trim: true, lowercase: true },
+  phone: { type: String, required: true, trim: true },
+}, { _id: false });
+
+const shippingAddressSchema = new Schema({
+  department: { type: String, required: true, trim: true },
+  city: { type: String, required: true, trim: true },
+  address: { type: String, required: true, trim: true },
+  postalCode: { type: String, trim: true },
+  country: { type: String, required: true, default: 'Colombia' },
 }, { _id: false });
 
 const orderSchema = new Schema<IOrder>({
@@ -30,6 +37,10 @@ const orderSchema = new Schema<IOrder>({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
+    required: false,
+  },
+  customer: {
+    type: customerSchema,
     required: true,
   },
   items: {
@@ -74,7 +85,7 @@ const orderSchema = new Schema<IOrder>({
     required: true,
   },
   shippingAddress: {
-    type: addressSchema,
+    type: shippingAddressSchema,
     required: true,
   },
   notes: {
@@ -91,6 +102,8 @@ orderSchema.index({ user: 1 });
 orderSchema.index({ status: 1 });
 orderSchema.index({ orderNumber: 1 });
 orderSchema.index({ createdAt: -1 });
+orderSchema.index({ 'customer.email': 1 });
+orderSchema.index({ 'customer.phone': 1 });
 
 // Generate order number before saving
 orderSchema.pre('save', async function() {
